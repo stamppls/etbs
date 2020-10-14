@@ -40,12 +40,13 @@ const EXAMPLE_DATA: ListItem[] = [
  * (including sorting, pagination, and filtering).
  */
 export class ListDataSource extends DataSource<ListItem> {
-  data: ListItem[] = EXAMPLE_DATA;
+  data: ListItem[];
   paginator: MatPaginator;
   sort: MatSort;
 
-  constructor() {
+  constructor(private item: any[]) {
     super();
+    this.data = item;
   }
 
   /**
