@@ -2,7 +2,7 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ListDataSource, ListItem } from './list-datasource';
 
 @Component({
@@ -17,9 +17,12 @@ export class ListComponent implements AfterViewInit, OnInit {
   dataSource: ListDataSource;
 
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['id', 'name'];
+  displayedColumns = ['id', 'name','menu'];
 
-  constructor(private route: ActivatedRoute){
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router
+    ){
 
   }
   ngOnInit() {
@@ -30,5 +33,13 @@ export class ListComponent implements AfterViewInit, OnInit {
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
     this.table.dataSource = this.dataSource;
+  }
+
+  btnAdd(){
+    this.router.navigateByUrl('bank/form/new');
+  }
+
+  btnEdit(body){
+    console.log(body);
   }
 }

@@ -1,17 +1,26 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ConstantPool } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
+import { rejects } from 'assert';
+import { promise } from 'protractor';
+import { Observable, observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BankService implements Resolve<any> {
-
+  routeParam: any;
   constructor(private http: HttpClient) { }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-    return this.getBankList();
+    this.routeParam = route.params
+    if (this.routeParam.id) {
+      this.checkCreateOrEdit(this.routeParam.id);
+    } else {
+      return this.getBankList();
+    }
   }
 
   private authorizationHeader() {
@@ -23,5 +32,29 @@ export class BankService implements Resolve<any> {
 
   getBankList() {
     return this.http.get('http://localhost:3000/api/banks', { headers: this.authorizationHeader() })
+  }
+
+  checkCreateOrEdit(id): Promise<any> {
+    if (id === 'new') {
+      return new Promise((resolve, rejects) => {
+        resolve(this.initialData());
+
+      })
+    } else {
+      return new Promise((resolve, rejects) => {
+        resolve(this.getBankById(id));
+      })
+    }
+  }
+
+  initialData() {
+    let body;
+    return body = {
+      id: null
+    }
+  }
+
+  getBankById(id) {
+    return this.http.get('http://localhost:3000/api/banks' + id, { headers: this.authorizationHeader() })
   }
 }
