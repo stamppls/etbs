@@ -40,6 +40,6 @@ export class ListComponent implements AfterViewInit, OnInit {
   }
 
   btnEdit(body){
-    console.log(body);
+    this.router.navigateByUrl('bank/form/' + body._id);
   }
 }

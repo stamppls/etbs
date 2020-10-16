@@ -1,10 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ConstantPool } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { rejects } from 'assert';
-import { promise } from 'protractor';
-import { Observable, observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -17,9 +13,12 @@ export class BankService implements Resolve<any> {
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     this.routeParam = route.params
     if (this.routeParam.id) {
-      this.checkCreateOrEdit(this.routeParam.id);
+      if (this.routeParam.id !== 'new') {
+        return this.getDataById(this.routeParam.id);
+      }
+      return this.initialData();
     } else {
-      return this.getBankList();
+      return this.getDataList();
     }
   }
 
@@ -30,31 +29,42 @@ export class BankService implements Resolve<any> {
     return headers;
   }
 
-  getBankList() {
+  getDataList() {
     return this.http.get('http://localhost:3000/api/banks', { headers: this.authorizationHeader() })
-  }
-
-  checkCreateOrEdit(id): Promise<any> {
-    if (id === 'new') {
-      return new Promise((resolve, rejects) => {
-        resolve(this.initialData());
-
-      })
-    } else {
-      return new Promise((resolve, rejects) => {
-        resolve(this.getBankById(id));
-      })
-    }
   }
 
   initialData() {
     let body;
     return body = {
-      id: null
+      name: "",
+      image: "https://icon-library.com/images/add-picture-icon/add-picture-icon-14.jpg",
+      separatetype: null,
+      separatechar: "",
+      rows: [
+        {
+          fields: [
+            {
+              fieldname: "",
+              fieldtype: "",
+              fieldlength: null,
+              defaultvalue: "",
+              seq: 1,
+              example: ""
+            }
+          ]
+        }
+      ],
+      encryptcmd: "",
+      uploadcmd: "",
+      maxamount: 200
     }
   }
 
-  getBankById(id) {
-    return this.http.get('http://localhost:3000/api/banks' + id, { headers: this.authorizationHeader() })
+  getDataById(id): Promise<any> {
+    return new Promise((resolve, rejects) => {
+      this.http.get('http://localhost:3000/api/banks/' + id, { headers: this.authorizationHeader() }).subscribe((res: any) => {
+        resolve(res.data);
+      })
+    })
   }
 }

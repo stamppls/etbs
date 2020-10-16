@@ -1,100 +1,73 @@
-<form [formGroup]="addressForm" novalidate (ngSubmit)="onSubmit()">
-  <mat-card class="shipping-card">
-    <mat-card-header>
-      <mat-card-title>Shipping Information</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="row">
-        <div class="col">
-          <mat-form-field class="full-width">
-            <input matInput placeholder="Company" formControlName="company">
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <mat-form-field class="full-width">
-            <input matInput placeholder="First name" formControlName="firstName">
-            <mat-error *ngIf="addressForm.controls['firstName'].hasError('required')">
-              First name is <strong>required</strong>
-            </mat-error>
-          </mat-form-field>
-        </div>
-        <div class="col">
-          <mat-form-field class="full-width">
-            <input matInput placeholder="Last name" formControlName="lastName">
-            <mat-error *ngIf="addressForm.controls['lastName'].hasError('required')">
-              Last name is <strong>required</strong>
-            </mat-error>
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <mat-form-field class="full-width">
-            <textarea matInput placeholder="Address" formControlName="address"></textarea>
-            <mat-error *ngIf="addressForm.controls['address'].hasError('required')">
-              Address is <strong>required</strong>
-            </mat-error>
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="row" *ngIf="!hasUnitNumber">
-        <div class="col">
-          <button mat-button type="button" (click)="hasUnitNumber = !hasUnitNumber">
-            + Add C/O, Apt, Suite, Unit
-          </button>
-        </div>
-      </div>
-      <div class="row" *ngIf="hasUnitNumber">
-        <div class="col">
-          <mat-form-field class="full-width">
-            <textarea matInput placeholder="Address 2" formControlName="address2"></textarea>
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <mat-form-field class="full-width">
-            <input matInput placeholder="City" formControlName="city">
-            <mat-error *ngIf="addressForm.controls['city'].hasError('required')">
-              City is <strong>required</strong>
-            </mat-error>
-          </mat-form-field>
-        </div>
-        <div class="col">
-          <!-- <mat-form-field class="full-width">
-            <mat-select placeholder="State" formControlName="state">
-              <mat-option *ngFor="let state of states" [value]="state.abbreviation">
-                {{ state.name }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="addressForm.controls['state'].hasError('required')">
-              State is <strong>required</strong>
-            </mat-error>
-          </mat-form-field> -->
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <mat-form-field class="full-width">
-            <input matInput #postalCode maxlength="5" placeholder="Postal Code" type="number" formControlName="postalCode">
-            <mat-hint align="end">{{postalCode.value.length}} / 5</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col">
-          <mat-radio-group formControlName="shipping">
-            <mat-radio-button value="free">Free Shipping</mat-radio-button>
-            <mat-radio-button value="priority">Priority Shipping</mat-radio-button>
-            <mat-radio-button value="nextday">Next Day Shipping</mat-radio-button>
-          </mat-radio-group>
-        </div>
-      </div>
-    </mat-card-content>
-    <mat-card-actions>
-      <button mat-raised-button color="primary" type="submit">Submit</button>
-    </mat-card-actions>
-  </mat-card>
-</form>
+<mat-card>
+  <mat-card-header fxLayoutAlign="space-around stretch">
+    <h3 fxFlex>Format File</h3>
+    <button mat-button>actionOne</button>
+  </mat-card-header>
+  <form [formGroup]="bankForm" fxLayout="row wrap" fxLayoutAlign="space-around stretch">
+    <div mat-card-avatar class="avatar-card" style="background-image: url('{{bankForm.value.image}}');">
+    </div>
+    <div fxLayout="column" fxFlex="70">
+      <mat-form-field>
+        <input matInput placeholder="name" formControlName="name">
+      </mat-form-field>
+      <mat-radio-group formControlName="separatetype">
+        <mat-radio-button fxFlex [value]="true">Fix Length</mat-radio-button>
+        <mat-radio-button fxFlex [value]="false">Separate Char</mat-radio-button>
+      </mat-radio-group>
+      <ng-template [ngIf]="!bankForm.value.separatetype">
+        <mat-form-field>
+          <input matInput placeholder="Separate Char" formControlName="separatechar">
+        </mat-form-field>
+      </ng-template>
+    </div>
+  </form>
+  <mat-card-content>
+    <mat-tab-group>
+      <mat-tab label="Format File">
+        <form [formGroup]="bankForm">
+          <div formArrayName="rows" *ngFor="let row of getRows();let idx = index;">
+            <div [formGroupName]="idx">
+              <table fxFlex style="margin-top: 20px;">
+                <tr style="text-align: center;">
+                  <th>Fieldname</th>
+                  <th>Fieldtype</th>
+                  <th>Fieldlength</th>
+                  <th>Default value</th>
+                  <th>Example data</th>
+                </tr>
+                <tr style="text-align: center;" formArrayName="fields" *ngFor="let field of getFields(row);let idy = index;">
+                  <td [formGroupName]="idy">
+                    <mat-form-field appearance="outline">
+                      <input matInput placeholder="Fieldname" formControlName="fieldname">
+                    </mat-form-field>
+                  </td>
+                  <td [formGroupName]="idy">
+                    <mat-form-field appearance="outline">
+                      <input matInput placeholder="Fieldtype" formControlName="fieldtype">
+                    </mat-form-field>
+                  </td>
+                  <td [formGroupName]="idy">
+                    <mat-form-field appearance="outline">
+                      <input matInput placeholder="Length" formControlName="fieldlength">
+                    </mat-form-field>
+                  </td>
+                  <td [formGroupName]="idy">
+                    <mat-form-field appearance="outline">
+                      <input matInput placeholder="Default value" formControlName="defaultvalue">
+                    </mat-form-field>
+                  </td>
+                  <td [formGroupName]="idy">
+                    <mat-form-field appearance="outline">
+                      <input matInput placeholder="Example Data" formControlName="example">
+                    </mat-form-field>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </form>
+      </mat-tab>
+      <mat-tab label="Other">Content 2</mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>

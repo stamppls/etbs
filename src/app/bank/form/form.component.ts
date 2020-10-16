@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { BankService } from '../bank.service';
 
@@ -9,22 +9,7 @@ import { BankService } from '../bank.service';
   styleUrls: ['./form.component.scss']
 })
 export class FormComponent implements OnInit {
-  addressForm = this.fb.group({
-    company: null,
-    firstName: [null, Validators.required],
-    lastName: [null, Validators.required],
-    address: [null, Validators.required],
-    address2: null,
-    city: [null, Validators.required],
-    state: [null, Validators.required],
-    postalCode: [null, Validators.compose([
-      Validators.required, Validators.minLength(5), Validators.maxLength(5)])
-    ],
-    shipping: ['free', Validators.required]
-  });
-
-  hasUnitNumber = false;
-
+  bankForm: FormGroup;
   constructor(
     private fb: FormBuilder,
     private bankService: BankService,
@@ -32,11 +17,55 @@ export class FormComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    let id = this.route.snapshot.params.id;
-    this.bankService.checkCreateOrEdit(id).then((res: any) => {
-      console.log(res);
+    let data = this.route.snapshot.data.item;
+    console.log(data);
+    this.bankForm = this.createForm(data);
+  }
+
+  createForm(data):FormGroup {
+    return this.fb.group({
+      name: data.name,
+      image: data.image,
+      separatetype: data.separatetype,
+      separatechar:  data.separatechar,
+      rows: this.fb.array(this.createRows(data))
     })
   }
+  
+  createRows(data): any[]{
+    let rows = [];
+    data.rows.forEach(row => {
+      rows.push(this.fb.group({
+        fields: this.fb.array(this.createFields(row))
+      }))
+    });
+    return rows;
+  }
+
+  createFields(row): any[]{
+    let fields = [];
+    row.fields.forEach(field => {
+      fields.push(this.fb.group({
+        fieldname: field.fieldname,
+        fieldtype: field.fieldtype,
+        fieldlength: field.fieldlength,
+        defaultvalue: field.defaultvalue,
+        example: field.example
+      }))
+    });
+    return fields;
+  }
+
+  getRows(){
+    let rows = (this.bankForm.get("rows") as FormArray).controls;
+    return rows;
+  }
+
+  getFields(row){
+    let fields = (row.get("fields") as FormArray).controls;
+    return fields
+  }
+  
 
   onSubmit() {
     alert('Thanks!');
